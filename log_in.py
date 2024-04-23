@@ -24,76 +24,52 @@ class SignInStrategy(UserAuthenticationStrategy):
     def authenticate(self):
         while True:
             username = Prompt.ask("Please enter your username, or 'back' to return to selection")
-            if username.lower() == "back":
-                select_option()
-            else:
-                if re.match(r'^\w+$', username) and db.check_username_taken(username):
-                    password = Prompt.ask("Please enter a password, or 'back' to return to selection", password=True)
-                    if password.lower() == "back":
-                        select_option()
-                    else:
-                        if db.authenticate_user(username, password):
-                            print(Panel("Authentication successful!", title="[bold green]Success[/bold green]", border_style="bold green"))
-                            print('\n')
-                            break
-                        else:
-                            print(Panel("Password is incorrect. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
-                            print('\n')
+            if re.match(r'^\w+$', username) and db.check_username_taken(username):
+                password = Prompt.ask("Please enter a password, or 'back' to return to selection", password=True)
+                if db.authenticate_user(username, password):
+                    print(Panel("Authentication successful!", title="[bold green]Success[/bold green]", border_style="bold green"))
+                    print('\n')
+                    break
                 else:
-                    print(Panel("That account doesn't exist. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
+                    print(Panel("Password is incorrect. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
+                    print('\n')
+            else:
+                print(Panel("That account doesn't exist. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
 
         return db.pull_user(f'username = "{username}"')
 
 class SignUpStrategy(UserAuthenticationStrategy):
     def authenticate(self):
-
-        username = None
-        password = None
-        dob = None
-
         while True:
             username = Prompt.ask("Please enter a username, or 'back' to return to selection")
-            if username.lower == "back":
-                return
-            else:
-                if re.match(r'^\w+$', username):
-                    if db.check_username_taken(username):
-                        print('\n')
-                        print(Panel("Username is already taken. Please try another username.", title="[bold red]Error[/bold red]", border_style="bold red"))
-                    else:
-                        password = Prompt.ask("Please enter a password, or 'back' to return to selection", password=True)
-                        if password.lower() == "back":
-                            return
-                        else:
-                            confirm_password = Prompt.ask("Please confirm your password, or 'back' to return to selection", password=True)
-                            if confirm_password.lower() == "back":
-                                return
-                            else:
-                                if password == confirm_password:
-                                    dob_input = Prompt.ask("Please enter your date of birth (YYYY-MM-DD), or 'back' to return to selection")
-                                    try:
-                                        if dob_input.lower() == "back":
-                                            select_option()
-                                        else:
-                                            dob = datetime.strptime(dob_input, "%Y-%m-%d")
-                                            age = datetime.now().year - dob.year
-                                            if db.push_user(data_dict={'username': username, 'password': password, 'age': age}):
-                                                print(Panel("Successfully created account!", title="[bold green]Success[/bold green]", border_style="bold green"))
-                                                print('\n')
-                                                break
-                                            else:
-                                                print(Panel("Error creating account. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
-                                                print('\n')
-                                    except ValueError:
-                                        print(Panel("Invalid date. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
-                                        print('\n')
-                                else:
-                                    print(Panel("Passwords do not match. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
-                                    print('\n')
-                else:
-                    print(Panel("Invalid username. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
+            if re.match(r'^\w+$', username):
+                if db.check_username_taken(username):
                     print('\n')
-
+                    print(Panel("Username is already taken. Please try another username.", title="[bold red]Error[/bold red]", border_style="bold red"))
+                else:
+                    password = Prompt.ask("Please enter a password, or 'back' to return to selection", password=True)
+                    confirm_password = Prompt.ask("Please confirm your password, or 'back' to return to selection", password=True)
+                    if password == confirm_password:
+                        dob_input = Prompt.ask("Please enter your date of birth (YYYY-MM-DD), or 'back' to return to selection")
+                        try:
+                            dob = datetime.strptime(dob_input, "%Y-%m-%d")
+                            age = datetime.now().year - dob.year
+                            if db.push_user(data_dict={'username': username, 'password': password, 'age': age}):
+                                print(Panel("Successfully created account!", title="[bold green]Success[/bold green]", border_style="bold green"))
+                                print('\n')
+                                break
+                            else:
+                                print(Panel("Error creating account. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
+                                print('\n')
+                        except ValueError:
+                            print(Panel("Invalid date. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
+                            print('\n')
+                    else:
+                        print(Panel("Passwords do not match. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
+                        print('\n')
+            else:
+                print(Panel("Invalid username. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
+                print('\n')
         return db.pull_user(f'username = "{username}"')
 
 class AuthenticationContext:
