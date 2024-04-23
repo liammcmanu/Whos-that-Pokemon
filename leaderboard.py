@@ -36,13 +36,16 @@ class leaderboard:
             if user['username'] == self.current_user['username']:
                 current_user_rank = i
                 current_user_high_score = user['high_score']
+                current_user_games_played = user['games_played']
                 break
 
         # Create a panel for the current user's high score and rank
         panel = Panel(
             f"Current User: {self.current_user['username']}\n"
             f"Rank: {current_user_rank}\n"
-            f"High Score: {current_user_high_score}",
+            f"High Score: {current_user_high_score}\n"
+            f"Games Played: {current_user_games_played}\n"
+            f"Avg Score: {round(current_user_high_score/current_user_games_played, 1)}",
             title="Your Leaderboard Stats",
             padding=(1, 2)
         )
@@ -62,8 +65,16 @@ class leaderboard:
         table.add_column("Rank", width=12)
         table.add_column("Username", width=20)
         table.add_column("High Score", width=12)
+        table.add_column("Games Played", width=15)
+        table.add_column("Avg Score", width=12)
 
         for i, user in enumerate(self.leaderboard_data, start=1):
-            table.add_row(str(i), user['username'], str(user['high_score']))
+            table.add_row(
+                str(i),
+                user['username'],
+                str(user['high_score']),
+                str(user['games_played']),
+                str(round(user['high_score']/user['games_played'], 1))
+            )
 
         console.print(table)

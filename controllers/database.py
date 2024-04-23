@@ -69,7 +69,7 @@ class database_controller:
         self.cursor.execute('SELECT * FROM user ORDER BY high_score DESC')
         raw = self.cursor.fetchall()
         if raw:
-            return [{"username": user[1], "high_score": user[4]} for user in raw]
+            return [{"username": user[1], "high_score": user[4], "games_played": user[5]} for user in raw]
         else:
             return None
 

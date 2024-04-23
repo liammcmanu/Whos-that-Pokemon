@@ -10,8 +10,8 @@ def generate_random_users(n):
             'username': user['login']['username'],
             'password': user['login']['password'],
             'age': user['dob']['age'],
-            'high_score': random.randint(1, 100),
-            'games_played': random.randint(1, 50)
+            'high_score': random.randint(1, 63),
+            'games_played': random.randint(1, 234)
         }
         for user in data['results']
     ]
