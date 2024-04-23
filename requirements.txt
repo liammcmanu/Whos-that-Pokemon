@@ -1,0 +1,6 @@
+rich
+inquirer
+sqlite3
+hashlib
+fuzzywuzzy
+bcrypt

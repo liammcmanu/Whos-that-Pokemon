@@ -5,6 +5,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 import controllers.database as database
+from game import game_loop
 
 class leaderboard:
 
@@ -18,11 +19,7 @@ class leaderboard:
         print("\n"*2)
 
         cmd = inquirer.list_input("Okay what now...", choices=["Who's that Pokemon 🔥🌿💧", "Exit 🏃"], default="Who's that Pokemon 🔥🌿💧")
-
-        if cmd == "Who's that Pokemon 🔥🌿💧":
-            return
-        else:
-            exit()
+        game_loop(cmd, current_user)
 
     def print_user(self):
 

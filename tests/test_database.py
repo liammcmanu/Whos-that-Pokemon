@@ -5,10 +5,10 @@ from controllers.database import database_controller
 class TestDatabaseController(unittest.TestCase):
     def setUp(self):
         self.db = database_controller(':memory:')
-    
+
     def tearDown(self):
         self.db.conn.close()
-    
+
     def test_push_user(self):
         data_dict = {
             'username': 'test_user',
@@ -45,7 +45,7 @@ class TestDatabaseController(unittest.TestCase):
         self.db.push_user(data_dict)
         self.assertTrue(self.db.authenticate_user('test_user', 'test_password'))
         self.assertFalse(self.db.authenticate_user('test_user', 'wrong_password'))
-    
+
     def test_check_username_taken(self):
         data_dict = {
             'username': 'test_user',
@@ -57,7 +57,7 @@ class TestDatabaseController(unittest.TestCase):
         self.db.push_user(data_dict)
         self.assertTrue(self.db.check_username_taken('test_user'))
         self.assertFalse(self.db.check_username_taken('non_existing_user'))
-    
+
     def test_get_leaderboard(self):
         data_dict1 = {
             'username': 'user1',
@@ -81,7 +81,7 @@ class TestDatabaseController(unittest.TestCase):
         self.assertEqual(leaderboard[0]['high_score'], 200)
         self.assertEqual(leaderboard[1]['username'], 'user2')
         self.assertEqual(leaderboard[1]['high_score'], 150)
-    
+
     def test_update_after_game(self):
         data_dict = {
             'username': 'test_user',
