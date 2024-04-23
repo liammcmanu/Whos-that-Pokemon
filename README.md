@@ -1,11 +1,17 @@
-# Who's That Pokémon?
+## Who's That Pokémon Project
+This project is a fun, interactive console-based game inspired by the "Who's That Pokémon?" segment from the Pokémon TV series.
 
-## Description
+## Overview
+In the game, players are shown an obscured image of a Pokémon and must guess the Pokémon's name. The game includes the ability to select a generation to guess from and multiple difficulty levels determined from age to enhance the gameplay experience.
 
-This project is a fun and interactive game called "Who's That Pokémon?". It's a PyQt-based GUI application that challenges players to guess the name of a Pokémon based on its silhouette.
+## How It Works
+The game uses ASCII art to display the obscured Pokémon images in the console. The ASCII art is generated from actual Pokémon images, fetched from the PokeAPI, using the ascii_magic library.
 
-The application uses a QStackedWidget to manage different widgets or "pages". The QStackedWidget provides a stack of widgets, only one of which can be viewed at a time. This is useful for creating wizards or for stacking widgets which occupy the same space in a layout.
+The game also uses the rich library to enhance the console display with rich text and beautiful formatting. This includes color and style formatting, as well as advanced features like tables, markdown, and syntax highlighting.
 
-The game has two main pages: the main menu and the guess page. The main menu provides options to start the game or exit the application. The guess page displays a silhouette of a Pokémon and provides an input field for the player to enter their guess.
+All pokemon game data is fetched from the PokeAPI and this is all handled in the PokeAPI controller.
 
-The application also uses a custom style sheet (stylesheet.qss) to customize the appearance of the widgets. This style sheet is loaded at the start of the application and applied to the QApplication instance.
+The user data, including usernames, passwords and highscores is all stored in the database and managed through the db controller. The log_in.py file handles user authentication. Users can create an account with a username, password, and date of birth. The authenticate method in this file prompts the user to enter their username and password, and checks if the entered credentials are correct.
+
+## How to Play
+To play the game, run the main.py file from your terminal. If you're a new user, you'll be prompted to create an account. Once you're logged in, you can start guessing Pokémon!
