@@ -13,18 +13,29 @@ current_user = None
 
 print('\n')
 
+from PIL import Image
+import tempfile
+import ascii_magic
+
 def opening_screen():
-    # Get the path of the Pokemon logo image
-    logo_path = r"images\Pokemon-Logo.png"
-    # Open the image and convert it to RGBA
-    image = Image.open(logo_path).convert("RGBA")
-    # Save the image to a temporary file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
-        image.save(temp.name)
-        temp_path = temp.name
-    # Convert the sprite to ASCII with the specified options
-    output = ascii_magic.from_image(temp_path)
-    output.to_terminal()
+	"""
+	Displays the opening screen of the game.
+
+	This function opens the Pokemon logo image, converts it to RGBA format,
+	saves it to a temporary file, and then converts the sprite to ASCII
+	using the specified options. The resulting ASCII art is displayed on the terminal.
+	"""
+	# Get the path of the Pokemon logo image
+	logo_path = r"images\Pokemon-Logo.png"
+	# Open the image and convert it to RGBA
+	image = Image.open(logo_path).convert("RGBA")
+	# Save the image to a temporary file
+	with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
+		image.save(temp.name)
+		temp_path = temp.name
+	# Convert the sprite to ASCII with the specified options
+	output = ascii_magic.from_image(temp_path)
+	output.to_terminal()
 
 opening_screen()
 current_user = log_in()

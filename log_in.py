@@ -1,4 +1,5 @@
 from datetime import datetime
+from config import STORE_DOB
 from controllers.database import database_controller
 
 from rich import print
@@ -9,7 +10,7 @@ from abc import ABC, abstractmethod
 import re
 import inquirer
 
-db = database_controller("whos_that_pokemon.db")
+db = database_controller()
 
 class UserAuthenticationStrategy(ABC):
     @abstractmethod
@@ -17,15 +18,30 @@ class UserAuthenticationStrategy(ABC):
         pass
 
 class SignInStrategy(UserAuthenticationStrategy):
+    """
+    Represents a strategy for user sign-in authentication.
+
+    This class provides a method to authenticate a user by prompting for their
+    username and password. It uses the `Prompt` class to interact with the user
+    and the `db` module to check the username and authenticate the user.
+
+    Attributes:
+        username (str): The username entered by the user.
+        password (str): The password entered by the user.
+
+    Methods:
+        authenticate: Authenticates the user by prompting for their username and password.
+
+    """
 
     username = None
     password = None
 
     def authenticate(self):
         while True:
-            username = Prompt.ask("Please enter your username, or 'back' to return to selection")
+            username = Prompt.ask("Please enter your username")
             if re.match(r'^\w+$', username) and db.check_username_taken(username):
-                password = Prompt.ask("Please enter a password, or 'back' to return to selection", password=True)
+                password = Prompt.ask("Please enter a password", password=True)
                 if db.authenticate_user(username, password):
                     print(Panel("Authentication successful!", title="[bold green]Success[/bold green]", border_style="bold green"))
                     print('\n')
@@ -39,31 +55,50 @@ class SignInStrategy(UserAuthenticationStrategy):
         return db.pull_user(f'username = "{username}"')
 
 class SignUpStrategy(UserAuthenticationStrategy):
+    """
+    Represents a strategy for user sign up/authentication.
+
+    This strategy prompts the user to enter a username, password, and date of birth,
+    and then creates a new user account if the provided information is valid.
+
+    Attributes:
+        None
+
+    Methods:
+        authenticate: Prompts the user for username, password, and date of birth,
+                      and creates a new user account if the information is valid.
+    """
     def authenticate(self):
         while True:
-            username = Prompt.ask("Please enter a username, or 'back' to return to selection")
+            username = Prompt.ask("Please enter a username")
             if re.match(r'^\w+$', username):
                 if db.check_username_taken(username):
                     print('\n')
                     print(Panel("Username is already taken. Please try another username.", title="[bold red]Error[/bold red]", border_style="bold red"))
                 else:
-                    password = Prompt.ask("Please enter a password, or 'back' to return to selection", password=True)
-                    confirm_password = Prompt.ask("Please confirm your password, or 'back' to return to selection", password=True)
+                    password = Prompt.ask("Please enter a password", password=True)
+                    confirm_password = Prompt.ask("Please confirm your password", password=True)
                     if password == confirm_password:
-                        dob_input = Prompt.ask("Please enter your date of birth (YYYY-MM-DD), or 'back' to return to selection")
-                        try:
-                            dob = datetime.strptime(dob_input, "%Y-%m-%d")
-                            age = datetime.now().year - dob.year
-                            if db.push_user(data_dict={'username': username, 'password': password, 'age': age}):
+                        if STORE_DOB:
+                            dob_input = Prompt.ask("Please enter your date of birth (YYYY-MM-DD)")
+                            try:
+                                dob = datetime.strptime(dob_input, "%Y-%m-%d")
+                                age = datetime.now().year - dob.year
+                                if db.push_user(data_dict={'username': username, 'password': password, 'age': age}):
+                                    print(Panel("Successfully created account!", title="[bold green]Success[/bold green]", border_style="bold green"))
+                                    print('\n')
+                                    break
+                                else:
+                                    print(Panel("Error creating account. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
+                                    print('\n')
+                            except ValueError:
+                                print(Panel("Invalid date. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
+                                print('\n')
+                        else:
+                              if db.push_user(data_dict={'username': username, 'password': password}):
                                 print(Panel("Successfully created account!", title="[bold green]Success[/bold green]", border_style="bold green"))
                                 print('\n')
                                 break
-                            else:
-                                print(Panel("Error creating account. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
-                                print('\n')
-                        except ValueError:
-                            print(Panel("Invalid date. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
-                            print('\n')
                     else:
                         print(Panel("Passwords do not match. Please try again.", title="[bold red]Error[/bold red]", border_style="bold red"))
                         print('\n')

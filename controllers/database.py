@@ -1,8 +1,28 @@
 import sqlite3
 import hashlib
 
+from config import DEFAULT_DB_NAME, STORE_DOB
+
 class database_controller:
-    def __init__(self, db_name):
+    """
+    A class that represents a database controller for user data.
+
+    Attributes:
+    - conn: The connection to the SQLite database.
+    - cursor: The cursor object to execute SQL queries.
+
+    Methods:
+    - __init__(self, db_name): Initializes the database controller with the specified database name.
+    - push_user(self, data_dict): Inserts a new user into the database.
+    - pull_user(self, condition=None): Retrieves a user from the database based on the given condition.
+    - authenticate_user(self, username, password): Authenticates a user based on the given username and password.
+    - check_username_taken(self, username): Checks if a username is already taken in the database.
+    - get_leaderboard(self): Retrieves the leaderboard from the database.
+    - update_after_game(self, username, score): Updates the user's high score and games played after a game.
+
+    """
+
+    def __init__(self, db_name=DEFAULT_DB_NAME):
         self.conn = sqlite3.connect(db_name)
         self.cursor = self.conn.cursor()
 
@@ -20,11 +40,24 @@ class database_controller:
         self.conn.commit()
 
     def push_user(self, data_dict):
+        """
+        Inserts a new user into the database.
+
+        Args:
+        - data_dict: A dictionary containing the user data.
+
+        Returns:
+        - True if the user was successfully inserted, False otherwise.
+
+        """
         try:
             # Hash the password before storing it
             password = data_dict['password']
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
             data_dict['password'] = hashed_password
+
+            if not STORE_DOB:
+                data_dict['age'] = 20
 
             if 'high_score' not in data_dict:
                 data_dict['high_score'] = 0
@@ -43,6 +76,16 @@ class database_controller:
             return False
 
     def pull_user(self, condition=None):
+        """
+        Retrieves a user from the database based on the given condition.
+
+        Args:
+        - condition: The condition to filter the user data (optional).
+
+        Returns:
+        - A dictionary containing the user data if found, None otherwise.
+
+        """
         sql = 'SELECT * FROM user'
         if condition:
             sql += f' WHERE {condition}'
@@ -54,6 +97,17 @@ class database_controller:
             return None
 
     def authenticate_user(self, username, password):
+        """
+        Authenticates a user based on the given username and password.
+
+        Args:
+        - username: The username of the user.
+        - password: The password of the user.
+
+        Returns:
+        - True if the user is authenticated, False otherwise.
+
+        """
         user = self.pull_user(f'username = "{username}"')
         if user:
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
@@ -62,10 +116,27 @@ class database_controller:
             return False
 
     def check_username_taken(self, username):
+        """
+        Checks if a username is already taken in the database.
+
+        Args:
+        - username: The username to check.
+
+        Returns:
+        - True if the username is taken, False otherwise.
+
+        """
         user = self.pull_user(f'username = "{username}"')
         return bool(user)
 
     def get_leaderboard(self):
+        """
+        Retrieves the leaderboard from the database.
+
+        Returns:
+        - A list of dictionaries containing the usernames, high scores, and games played of the users in descending order of high score.
+
+        """
         self.cursor.execute('SELECT * FROM user ORDER BY high_score DESC')
         raw = self.cursor.fetchall()
         if raw:
@@ -74,6 +145,17 @@ class database_controller:
             return None
 
     def update_after_game(self, username, score):
+        """
+        Updates the user's high score and games played after a game.
+
+        Args:
+        - username: The username of the user.
+        - score: The score achieved in the game.
+
+        Returns:
+        - True if the user's high score and games played were successfully updated, False otherwise.
+
+        """
         user = self.pull_user(f'username = "{username}"')
         if user:
             current_score = user["high_score"]
