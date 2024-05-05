@@ -1,6 +1,8 @@
 rich
 inquirer
-sqlite3
-hashlib
 fuzzywuzzy
 bcrypt
+pillow
+ascii_magic
+requests
+python-Levenshtein

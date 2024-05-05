@@ -1,8 +1,9 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from controllers.database import database_controller
 
 class TestDatabaseController(unittest.TestCase):
+
     def setUp(self):
         self.db = database_controller(':memory:')
 

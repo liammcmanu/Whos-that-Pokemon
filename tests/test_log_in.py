@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 
 from log_in import SignUpStrategy, SignInStrategy, log_in, select_option
 
